@@ -1,6 +1,7 @@
-import WebSocket from 'ws'
 import ReconnectingWebSocket from 'reconnecting-websocket'
+import WebSocket from 'ws'
 
+const hasGlobalWebSocket = typeof(window) !== 'undefined' && !!window.WebSocket
 
 export function BaseSocketConnection(options = {}) {
 	const host = options.host || 'localhost'
@@ -9,7 +10,19 @@ export function BaseSocketConnection(options = {}) {
 
 	const url = `ws://${host}:${port}/${route}`
 
-	const rws = new ReconnectingWebSocket(url, null)
+	const defaultOptions = {
+		constructor: (hasGlobalWebSocket) ?  window.WebSocket : WebSocket,
+		maxReconnectionDelay: 10000,
+		minReconnectionDelay: 1500,
+		reconnectionDelayGrowFactor: 1.3,
+		connectionTimeout: 4000,
+		maxRetries: Infinity,
+		debug: false,
+	};
+
+	console.log(defaultOptions)
+
+	const rws = new ReconnectingWebSocket(url, [], defaultOptions)
 
 	return rws
 }
