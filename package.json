@@ -1,0 +1,23 @@
+{
+  "name": "agent-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "npm run build && find ./lib -name '*.test.js' | xargs mocha -R spec",
+    "build": "rm -rf ./lib && babel src --out-dir lib"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
+    "mocha": "^3.4.2"
+  },
+  "dependencies": {
+    "reconnecting-websocket": "^3.2.2"
+  }
+}
