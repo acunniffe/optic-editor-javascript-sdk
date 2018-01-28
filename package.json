@@ -1,14 +1,14 @@
 {
-  "name": "agent-sdk",
-  "version": "1.0.0",
+  "name": "optic-editor-sdk",
+  "version": "0.1.0",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "test": "npm run build && find ./lib -name '*.test.js' | xargs mocha -R spec",
     "build": "rm -rf ./lib && babel src --out-dir lib"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "opticdev",
+  "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",

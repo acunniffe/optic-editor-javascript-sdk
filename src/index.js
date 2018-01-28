@@ -1,2 +1,2 @@
 export {AgentConnection} from './AgentConnection';
-export {EditorConnection} from './EditorConnection';
+export {EditorConnection, checkForSearch} from './EditorConnection';

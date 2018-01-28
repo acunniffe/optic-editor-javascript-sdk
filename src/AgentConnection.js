@@ -1,13 +1,13 @@
 import {BaseSocketConnection} from "./BaseSocketConnection";
 
 /* Handlers
+	- on-connect
 	- context-found
-	- configuration
 	- search-results
 
    Actions
-	   - update-model
-	   - insert
+	   - put-update
+	   - search
  */
 
 
@@ -22,6 +22,7 @@ export function AgentConnection(options = {}) {
 
 	const _ConnectCallbacks = []
 	const _ContextCallbacks = []
+	const _SearchCallbacks = []
 
 	socket.addEventListener('open', (data)=> {
 		_ConnectCallbacks.forEach(i=> i(data))
@@ -32,6 +33,10 @@ export function AgentConnection(options = {}) {
 		switch (message.event) {
 			case 'context-found':
 				_ContextCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'search-results':
+				_SearchCallbacks.forEach(i=> i(message))
 				break;
 
 			default:
@@ -45,6 +50,9 @@ export function AgentConnection(options = {}) {
 	const actions = {
 		putUpdate: (id, newValue) => {
 			socket.send(JSON.stringify({event: 'put-update', id, newValue}))
+		},
+		search: (query) => {
+			socket.send(JSON.stringify({event: 'search', query}))
 		}
 	}
 
@@ -58,10 +66,15 @@ export function AgentConnection(options = {}) {
 			}
 		},
 
-		_ContextCallbacks: [],
 		onContextFound:(func)=> {
 			if (typeof func === 'function') {
 				_ContextCallbacks.push(func)
+			}
+		},
+
+		onSearchResults:(func)=> {
+			if (typeof func === 'function') {
+				_SearchCallbacks.push(func)
 			}
 		},
 		actions

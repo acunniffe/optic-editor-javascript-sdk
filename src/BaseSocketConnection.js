@@ -20,8 +20,6 @@ export function BaseSocketConnection(options = {}) {
 		debug: false,
 	};
 
-	console.log(defaultOptions)
-
 	const rws = new ReconnectingWebSocket(url, [], defaultOptions)
 
 	return rws

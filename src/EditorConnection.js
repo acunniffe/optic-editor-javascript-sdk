@@ -1,9 +1,10 @@
 import {BaseSocketConnection} from "./BaseSocketConnection";
 /* Handlers
-	- replace
+	//none
 
    Actions
 	- context
+	- search
  */
 
 export function EditorConnection(options = {}) {
@@ -22,12 +23,16 @@ export function EditorConnection(options = {}) {
 	})
 
 	const _handleMessage = (raw) => {
-		const message = JSON.parse(raw.data)
-		switch (message.event) {
-			default:
-				console.log(message)
-				console.warn(`Unknown message type '${message.event}' received`)
-				break;
+		try {
+			const message = JSON.parse(raw.data)
+			switch (message.event) {
+				default:
+					console.log(message)
+					console.warn(`Unknown message type '${message.event}' received`)
+					break;
+			}
+		} catch (e) {
+
 		}
 	}
 
@@ -36,6 +41,9 @@ export function EditorConnection(options = {}) {
 	const actions = {
 		context: (file, start, end, contents) => {
 			socket.send(JSON.stringify({event: 'context', file, start, end, contents}))
+		},
+		search: (file, start, end, query) => {
+			socket.send(JSON.stringify({event: 'search', file, start, end, query}))
 		}
 	}
 
@@ -53,5 +61,19 @@ export function EditorConnection(options = {}) {
 	}
 
 	return connection
+
+}
+
+
+const searchRegex = /^[\s]*\/\/\/[\s]*(.+)/
+export function checkForSearch(line, start, end) {
+
+	const match = searchRegex.exec(line)
+
+	const isSearch = (start === end) && match !== null
+	return {
+		isSearch,
+		query: (match !== null) ? match[1].trim() : undefined
+	}
 
 }

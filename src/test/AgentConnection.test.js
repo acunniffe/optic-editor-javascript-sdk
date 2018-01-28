@@ -18,7 +18,16 @@ describe('Agent Connection', ()=> {
 				done()
 			})
 
-			agentConnection._handleMessage(JSON.stringify({type: 'context-found'}))
+			agentConnection._handleMessage({data: JSON.stringify({event: 'context-found'})})
+		})
+
+		it('search-results messages', (done)=> {
+
+			agentConnection.onSearchResults(()=> {
+				done()
+			})
+
+			agentConnection._handleMessage({data: JSON.stringify({event: 'search-results'})})
 		})
 	})
 
