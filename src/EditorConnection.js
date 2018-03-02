@@ -17,6 +17,7 @@ export function EditorConnection(options = {}) {
 	const socket = BaseSocketConnection({...defaultOptions, ...options})
 
 	const _ConnectCallbacks = []
+	const _FileUpdatedCallbacks = []
 
 	socket.addEventListener('open', (data)=> {
 		_ConnectCallbacks.forEach(i=> i(data))
@@ -26,6 +27,9 @@ export function EditorConnection(options = {}) {
 		try {
 			const message = JSON.parse(raw.data)
 			switch (message.event) {
+				case 'files-updated':
+					_FileUpdatedCallbacks.forEach(i=> i(message))
+					break;
 				default:
 					console.log(message)
 					console.warn(`Unknown message type '${message.event}' received`)
@@ -42,8 +46,8 @@ export function EditorConnection(options = {}) {
 		context: (file, start, end, contents) => {
 			socket.send(JSON.stringify({event: 'context', file, start, end, contents}))
 		},
-		search: (file, start, end, query) => {
-			socket.send(JSON.stringify({event: 'search', file, start, end, query}))
+		search: (file, start, end, query, contents) => {
+			socket.send(JSON.stringify({event: 'search', file, start, end, query, contents}))
 		}
 	}
 
@@ -54,6 +58,11 @@ export function EditorConnection(options = {}) {
 		onConnect:(func)=> {
 			if (typeof func === 'function') {
 				_ConnectCallbacks.push(func)
+			}
+		},
+		onFilesUpdated:(func)=> {
+			if (typeof func === 'function') {
+				_FileUpdatedCallbacks.push(func)
 			}
 		},
 		actions

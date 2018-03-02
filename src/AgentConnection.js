@@ -51,8 +51,11 @@ export function AgentConnection(options = {}) {
 		putUpdate: (id, newValue) => {
 			socket.send(JSON.stringify({event: 'put-update', id, newValue}))
 		},
-		search: (query) => {
-			socket.send(JSON.stringify({event: 'search', query}))
+		search: (query, lastProjectName, file, start, end) => {
+			socket.send(JSON.stringify({event: 'search', query, lastProjectName, file, start, end}))
+		},
+		postChanges: (projectName, changes) => {
+			socket.send(JSON.stringify({event: 'post-changes', projectName, changes}))
 		}
 	}
 
