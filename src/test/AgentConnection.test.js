@@ -29,6 +29,15 @@ describe('Agent Connection', ()=> {
 
 			agentConnection._handleMessage({data: JSON.stringify({event: 'search-results'})})
 		})
+
+		it('status-update messages', (done)=> {
+
+			agentConnection.onStatusChange(()=> {
+				done()
+			})
+
+			agentConnection._handleMessage({data: JSON.stringify({event: 'status-update'})})
+		})
 	})
 
 })

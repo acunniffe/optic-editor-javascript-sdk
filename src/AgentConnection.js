@@ -22,6 +22,7 @@ export function AgentConnection(options = {}) {
 
 	const _ConnectCallbacks = []
 	const _ContextCallbacks = []
+	const _StatusCallbacks = []
 	const _SearchCallbacks = []
 
 	socket.addEventListener('open', (data)=> {
@@ -29,6 +30,7 @@ export function AgentConnection(options = {}) {
 	})
 
 	const _handleMessage = (raw) => {
+		console.log(raw)
 		const message = JSON.parse(raw.data)
 		switch (message.event) {
 			case 'context-found':
@@ -37,6 +39,10 @@ export function AgentConnection(options = {}) {
 
 			case 'search-results':
 				_SearchCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'status-update':
+				_StatusCallbacks.forEach(i=> i(message))
 				break;
 
 			default:
@@ -78,6 +84,11 @@ export function AgentConnection(options = {}) {
 		onSearchResults:(func)=> {
 			if (typeof func === 'function') {
 				_SearchCallbacks.push(func)
+			}
+		},
+		onStatusChange:(func)=> {
+			if (typeof func === 'function') {
+				_StatusCallbacks.push(func)
 			}
 		},
 		actions
