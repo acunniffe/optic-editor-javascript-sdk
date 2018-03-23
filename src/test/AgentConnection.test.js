@@ -38,6 +38,15 @@ describe('Agent Connection', ()=> {
 
 			agentConnection._handleMessage({data: JSON.stringify({event: 'status-update'})})
 		})
+
+		it('knowledge-graph-update messages', (done)=> {
+
+			agentConnection.onKnowledgeGraphUpdate(()=> {
+				done()
+			})
+
+			agentConnection._handleMessage({data: JSON.stringify({event: 'knowledge-graph-update'})})
+		})
 	})
 
 })

@@ -23,6 +23,7 @@ export function AgentConnection(options = {}) {
 	const _ConnectCallbacks = []
 	const _ContextCallbacks = []
 	const _StatusCallbacks = []
+	const _KnowledgeGraphUpdateCallbacks = []
 	const _SearchCallbacks = []
 
 	socket.addEventListener('open', (data)=> {
@@ -43,6 +44,10 @@ export function AgentConnection(options = {}) {
 
 			case 'status-update':
 				_StatusCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'knowledge-graph-update':
+				_KnowledgeGraphUpdateCallbacks.forEach(i=> i(message))
 				break;
 
 			default:
@@ -89,6 +94,11 @@ export function AgentConnection(options = {}) {
 		onStatusChange:(func)=> {
 			if (typeof func === 'function') {
 				_StatusCallbacks.push(func)
+			}
+		},
+		onKnowledgeGraphUpdate:(func)=> {
+			if (typeof func === 'function') {
+				_KnowledgeGraphUpdateCallbacks.push(func)
 			}
 		},
 		actions
