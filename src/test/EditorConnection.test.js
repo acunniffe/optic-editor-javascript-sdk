@@ -2,7 +2,7 @@ import assert from 'assert'
 import {AgentConnection} from "../AgentConnection";
 import {checkForSearch, EditorConnection} from "../EditorConnection";
 
-describe('Agent Connection', ()=> {
+describe('Editor Connection', ()=> {
 
 	it('can connect to agent server', (done)=> {
 		const editorConnection = EditorConnection({name: 'sublime'})
