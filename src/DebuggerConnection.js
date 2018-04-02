@@ -17,6 +17,7 @@ export function DebuggerConnection(options = {}) {
 	const socket = BaseSocketConnection({...defaultOptions, ...options})
 
 	const _ConnectCallbacks = []
+	const _debugNoneCallbacks = []
 	const _debugLoadingCallbacks = []
 	const _debugInformationCallbacks = []
 
@@ -30,6 +31,9 @@ export function DebuggerConnection(options = {}) {
 			switch (message.event) {
 				case 'debug-loading':
 					_debugLoadingCallbacks.forEach(i=> i(message))
+					break;
+				case 'debug-none':
+					_debugNoneCallbacks.forEach(i=> i(message))
 					break;
 				case 'debug-information':
 					_debugInformationCallbacks.forEach(i=> i(message))
@@ -60,6 +64,11 @@ export function DebuggerConnection(options = {}) {
 		onDebugLoading:(func)=> {
 			if (typeof func === 'function') {
 				_debugLoadingCallbacks.push(func)
+			}
+		},
+		onDebugNone:(func)=> {
+			if (typeof func === 'function') {
+				_debugNoneCallbacks.push(func)
 			}
 		},
 		onDebugInformation:(func)=> {
