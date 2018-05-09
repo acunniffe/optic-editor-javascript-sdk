@@ -22,6 +22,7 @@ export function AgentConnection(options = {}) {
 
 	const _ConnectCallbacks = []
 	const _ContextCallbacks = []
+	const _SyncStagedCallbacks = []
 	const _StatusCallbacks = []
 	const _KnowledgeGraphUpdateCallbacks = []
 	const _SearchCallbacks = []
@@ -36,6 +37,10 @@ export function AgentConnection(options = {}) {
 		switch (message.event) {
 			case 'context-found':
 				_ContextCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'sync-staged':
+				_SyncStagedCallbacks.forEach(i=> i(message))
 				break;
 
 			case 'search-results':
@@ -67,6 +72,9 @@ export function AgentConnection(options = {}) {
 		},
 		postChanges: (projectName, changes) => {
 			socket.send(JSON.stringify({event: 'post-changes', projectName, changes}))
+		},
+		getSyncPatch: (projectName, changes) => {
+			socket.send(JSON.stringify({event: 'get-sync-patch', projectName, changes}))
 		}
 	}
 
@@ -85,7 +93,11 @@ export function AgentConnection(options = {}) {
 				_ContextCallbacks.push(func)
 			}
 		},
-
+		onSyncStaged:(func)=> {
+			if (typeof func === 'function') {
+				_SyncStagedCallbacks.push(func)
+			}
+		},
 		onSearchResults:(func)=> {
 			if (typeof func === 'function') {
 				_SearchCallbacks.push(func)
