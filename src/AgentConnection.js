@@ -73,8 +73,8 @@ export function AgentConnection(options = {}) {
 		postChanges: (projectName, changes) => {
 			socket.send(JSON.stringify({event: 'post-changes', projectName, changes}))
 		},
-		getSyncPatch: (projectName, changes) => {
-			socket.send(JSON.stringify({event: 'get-sync-patch', projectName, changes}))
+		getSyncPatch: (projectName) => {
+			socket.send(JSON.stringify({event: 'get-sync-patch', projectName}))
 		}
 	}
 
