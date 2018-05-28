@@ -13,7 +13,9 @@ export function EditorConnection(options = {}) {
 
 	const autorefreshes = options.autorefreshes === true
 
-	const route = (options.route || 'socket/editor/') + encodeURIComponent(name) + encodeURIComponent(`?autorefreshes=${autorefreshes}`)
+	const route = (options.route || 'socket/editor/') + encodeURIComponent(name) + `?autorefreshes=${autorefreshes}`
+
+	console.log(route)
 
 	const defaultOptions = {name, route}
 
