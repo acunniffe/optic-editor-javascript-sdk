@@ -10,7 +10,10 @@ import {BaseSocketConnection} from "./BaseSocketConnection";
 export function EditorConnection(options = {}) {
 
 	const name = options.name || 'Unknown Editor'
-	const route = (options.route || 'socket/editor/') + encodeURIComponent(name)
+
+	const autorefreshes = options.autorefreshes === true
+
+	const route = (options.route || 'socket/editor/') + encodeURIComponent(name) + encodeURIComponent(`?autorefreshes=${autorefreshes}`)
 
 	const defaultOptions = {name, route}
 

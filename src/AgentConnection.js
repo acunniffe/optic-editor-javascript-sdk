@@ -64,17 +64,17 @@ export function AgentConnection(options = {}) {
 	socket.addEventListener('message', (data)=> _handleMessage(data))
 
 	const actions = {
-		putUpdate: (id, newValue) => {
-			socket.send(JSON.stringify({event: 'put-update', id, newValue}))
+		putUpdate: (id, newValue, editorSlug) => {
+			socket.send(JSON.stringify({event: 'put-update', id, newValue, editorSlug}))
 		},
-		search: (query, lastProjectName, file, start, end) => {
-			socket.send(JSON.stringify({event: 'search', query, lastProjectName, file, start, end}))
+		search: (query, lastProjectName, editorSlug, file, start, end) => {
+			socket.send(JSON.stringify({event: 'search', query, lastProjectName, editorSlug, file, start, end}))
 		},
-		postChanges: (projectName, changes) => {
-			socket.send(JSON.stringify({event: 'post-changes', projectName, changes}))
+		postChanges: (projectName, editorSlug, changes) => {
+			socket.send(JSON.stringify({event: 'post-changes', projectName, editorSlug, changes}))
 		},
-		getSyncPatch: (projectName) => {
-			socket.send(JSON.stringify({event: 'get-sync-patch', projectName}))
+		getSyncPatch: (projectName, editorSlug) => {
+			socket.send(JSON.stringify({event: 'get-sync-patch', projectName, editorSlug}))
 		}
 	}
 
