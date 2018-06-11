@@ -25,6 +25,7 @@ export function AgentConnection(options = {}) {
 	const _SyncStagedCallbacks = []
 	const _StatusCallbacks = []
 	const _KnowledgeGraphUpdateCallbacks = []
+	const _ModelNodeOptionsUpdateCallbacks = []
 	const _SearchCallbacks = []
 	const _PostChangesResultsCallbacks = []
 
@@ -56,6 +57,10 @@ export function AgentConnection(options = {}) {
 				_KnowledgeGraphUpdateCallbacks.forEach(i=> i(message))
 				break;
 
+			case 'model-node-options-update':
+				_ModelNodeOptionsUpdateCallbacks.forEach(i=> i(message))
+				break;
+
 			case 'post-changes-results':
 				_PostChangesResultsCallbacks.forEach(i=> i(message))
 				break;
@@ -69,8 +74,8 @@ export function AgentConnection(options = {}) {
 	socket.addEventListener('message', (data)=> _handleMessage(data))
 
 	const actions = {
-		putUpdate: (id, newValue, editorSlug) => {
-			socket.send(JSON.stringify({event: 'put-update', id, newValue, editorSlug}))
+		putUpdate: (id, newValue, editorSlug, projectName) => {
+			socket.send(JSON.stringify({event: 'put-update', id, newValue, editorSlug, projectName}))
 		},
 		search: (query, lastProjectName, editorSlug, file, start, end) => {
 			socket.send(JSON.stringify({event: 'search', query, lastProjectName, editorSlug, file, start, end}))
@@ -116,6 +121,11 @@ export function AgentConnection(options = {}) {
 		onKnowledgeGraphUpdate:(func)=> {
 			if (typeof func === 'function') {
 				_KnowledgeGraphUpdateCallbacks.push(func)
+			}
+		},
+		onNamedModelNodeOptionsUpdate:(func)=> {
+			if (typeof func === 'function') {
+				_ModelNodeOptionsUpdateCallbacks.push(func)
 			}
 		},
 		onPostChangesResults:(func)=> {
