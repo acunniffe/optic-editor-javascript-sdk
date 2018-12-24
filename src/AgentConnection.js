@@ -20,21 +20,35 @@ export function AgentConnection(options = {}) {
 
 	const socket = BaseSocketConnection({...defaultOptions, ...options})
 
-	const _ConnectCallbacks = []
-	const _ContextCallbacks = []
-	const _SyncStagedCallbacks = []
-	const _StatusCallbacks = []
-	const _KnowledgeGraphUpdateCallbacks = []
-	const _ModelNodeOptionsUpdateCallbacks = []
-	const _SearchCallbacks = []
-	const _PostChangesResultsCallbacks = []
+	let _ConnectCallbacks = []
+	let _ContextCallbacks = []
+	let _StatusCallbacks = []
+	let _KnowledgeGraphUpdateCallbacks = []
+	let _ModelNodeOptionsUpdateCallbacks = []
+	let _SearchCallbacks = []
+	let _PostChangesResultsCallbacks = []
+	let _SyncStagedCallbacks = []
+	let _TransformationOptionsCallbacks = []
+	let _OnCopyToClipBoardCallbacks = []
+	let _OnErrorCallBacks = []
+	let _CollectAllResultsCallbacks = []
+	let _RuntimeAnalysisStartedCallbacks = []
+	let _RuntimeAnalysisFinishedCallbacks = []
+	let _SnapShotDeliveredCallbacks = []
+
+
+	socket.addEventListener('error', (err) => {
+		_OnErrorCallBacks.forEach(i=> i(err))
+	})
 
 	socket.addEventListener('open', (data)=> {
 		_ConnectCallbacks.forEach(i=> i(data))
 	})
 
 	const _handleMessage = (raw) => {
-		console.log(raw)
+		if (raw === 'pong') {
+			return
+		}
 		const message = JSON.parse(raw.data)
 		switch (message.event) {
 			case 'context-found':
@@ -65,6 +79,29 @@ export function AgentConnection(options = {}) {
 				_PostChangesResultsCallbacks.forEach(i=> i(message))
 				break;
 
+			case 'transformation-options-found':
+				_TransformationOptionsCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'copy-to-clipboard':
+				_OnCopyToClipBoardCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'collect-all-results':
+				_CollectAllResultsCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'runtime-analysis-started':
+				_RuntimeAnalysisStartedCallbacks.forEach(i=> i(message))
+				break;
+
+			case 'runtime-analysis-finished':
+				_RuntimeAnalysisFinishedCallbacks.forEach(i=> i(message))
+				break;
+			case 'deliver-snapshot':
+				_SnapShotDeliveredCallbacks.forEach(i=> i(message))
+				break;
+
 			default:
 				console.warn(`Unknown message type '${message.event}' received`)
 				break;
@@ -74,17 +111,32 @@ export function AgentConnection(options = {}) {
 	socket.addEventListener('message', (data)=> _handleMessage(data))
 
 	const actions = {
-		putUpdate: (id, newValue, editorSlug, projectName) => {
-			socket.send(JSON.stringify({event: 'put-update', id, newValue, editorSlug, projectName}))
+		putUpdate: (id, newValue, editorSlug) => {
+			socket.send(JSON.stringify({event: 'put-update', id, newValue, editorSlug}))
 		},
 		search: (query, lastProjectName, editorSlug, file, start, end) => {
 			socket.send(JSON.stringify({event: 'search', query, lastProjectName, editorSlug, file, start, end}))
 		},
-		postChanges: (projectName, editorSlug, changes) => {
-			socket.send(JSON.stringify({event: 'post-changes', projectName, editorSlug, changes}))
+		postChanges: (changes, editorSlug) => {
+			socket.send(JSON.stringify({event: 'post-changes', changes, editorSlug}))
 		},
-		getSyncPatch: (projectName, editorSlug) => {
-			socket.send(JSON.stringify({event: 'get-sync-patch', projectName, editorSlug}))
+		getSyncPatch: (editorSlug) => {
+			socket.send(JSON.stringify({event: 'get-sync-patch', editorSlug}))
+		},
+		getTransformationOptions: (transformationRef) => {
+			socket.send(JSON.stringify({event: 'transformation-options', transformationRef}))
+		},
+		collectAll: (schema) => {
+			socket.send(JSON.stringify({event: 'collect-all', schema}))
+		},
+		startRuntimeAnalysis: () => {
+			socket.send(JSON.stringify({event: 'start-runtime-analysis'}))
+		},
+		finishRuntimeAnalysis: () => {
+			socket.send(JSON.stringify({event: 'finish-runtime-analysis'}))
+		},
+		prepareSnapshot: () => {
+			socket.send(JSON.stringify({event: 'prepare-snapshot'}))
 		}
 	}
 
@@ -103,8 +155,11 @@ export function AgentConnection(options = {}) {
 				_ContextCallbacks.push(func)
 			}
 		},
-		onSyncStaged:(func)=> {
+		onSyncStaged:(func, unbindPrevious)=> {
 			if (typeof func === 'function') {
+				if (unbindPrevious) {
+					_SyncStagedCallbacks = []
+				}
 				_SyncStagedCallbacks.push(func)
 			}
 		},
@@ -131,6 +186,44 @@ export function AgentConnection(options = {}) {
 		onPostChangesResults:(func)=> {
 			if (typeof func === 'function') {
 				_PostChangesResultsCallbacks.push(func)
+			}
+		},
+		onTransformationOptions:(func, unbindPrevious)=> {
+			if (typeof func === 'function') {
+				if (unbindPrevious) {
+					_TransformationOptionsCallbacks = []
+				}
+				_TransformationOptionsCallbacks.push(func)
+			}
+		},
+		onCopyToClipboard:(func)=> {
+			if (typeof func === 'function') {
+				_OnCopyToClipBoardCallbacks.push(func)
+			}
+		},
+		onError:(func)=> {
+			if (typeof func === 'function') {
+				_OnErrorCallBacks.push(func)
+			}
+		},
+		onCollectAllResults:(func)=> {
+			if (typeof func === 'function') {
+				_CollectAllResultsCallbacks.push(func)
+			}
+		},
+		onRuntimeAnalysisStarted:(func)=> {
+			if (typeof func === 'function') {
+				_RuntimeAnalysisStartedCallbacks.push(func)
+			}
+		},
+		onRuntimeAnalysisFinished:(func)=> {
+			if (typeof func === 'function') {
+				_RuntimeAnalysisFinishedCallbacks.push(func)
+			}
+		},
+		onSnapshotDelivered:(func)=> {
+			if (typeof func === 'function') {
+				_SnapShotDeliveredCallbacks.push(func)
 			}
 		},
 		actions

@@ -68,7 +68,8 @@ export function EditorConnection(options = {}) {
 				_FileUpdatedCallbacks.push(func)
 			}
 		},
-		actions
+		actions,
+		_FileUpdatedCallbacks
 
 	}
 
